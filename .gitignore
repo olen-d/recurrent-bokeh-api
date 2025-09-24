@@ -1,0 +1,5 @@
+.DS_Store
+*.env
+config/settings.php
+public/assets/*
+vendor/*
