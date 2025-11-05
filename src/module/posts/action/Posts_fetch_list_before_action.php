@@ -74,7 +74,7 @@ final class Posts_fetch_list_before_action {
     }
 
     reset($posts_processed);
-    $after_datetime_mysql = current($posts_processed)['datetime'];
+    $after_datetime_mysql = sizeof($posts_processed) > 0 ? current($posts_processed)['datetime'] : $page_datetime_mysql;
 
     $sql_next =
       'SELECT id, datetime, headline, slug, body, image, alt_headline, alt_body, comments, exif_info
