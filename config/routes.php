@@ -21,6 +21,7 @@ return function (App $app) {
     $group->get('/posts/before/{datetime}', \App\module\posts\action\Posts_fetch_list_before_action::class);
     $group->get('/posts/previous/{datetime}', \App\module\posts\action\Posts_fetch_previous_action::class);
     $group->get('/posts/next/{datetime}', \App\module\posts\action\Posts_fetch_next_action::class);
+    $group->get('/posts/discussed/before[/{key}]', \App\module\posts\action\Posts_fetch_list_discussed_before_action::class);
     $group->get('/pixel', \App\resources\migrations\convert\Pixelpost_create_slugs::class);
     $group->get('/doritos', App\application\middlware\Cors_middleware::class);
   })->add(function ($request, $handler) {
