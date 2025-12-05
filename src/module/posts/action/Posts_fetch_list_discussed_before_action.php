@@ -25,7 +25,28 @@ final class Posts_fetch_list_discussed_before_action {
   
     $dtc = new Datetime_uri_converter();
 
-    $sql_order = $page_order_decoded === 'most' ? 'DESC' : 'ASC';
+    $sql_order = '';
+    $sql_order_reverse = '';
+    $sql_inequality = '';
+    $sql_inequality_or_equal = '';
+    $sql_inequality_reverse = '';
+    $sql_inequality_or_equal_reverse = '';
+
+    if ($page_order_decoded === 'most') {
+      $sql_order = 'DESC';
+      $sql_order_reverse = 'ASC';
+      $sql_inequality = '<';
+      $sql_inequality_or_equal = '<=';
+      $sql_inequality_reverse = '>';
+      $sql_inequality_or_equal_reverse = '>=';
+    } elseif ($page_order_decoded === 'least') {
+      $sql_order = 'ASC';
+      $sql_order_reverse = 'DESC';
+      $sql_inequality = '>';
+      $sql_inequality_or_equal = '>=';
+      $sql_inequality_reverse = '<';
+      $sql_inequality_or_equal_reverse = '<=';
+    }
 
     $page_key = array_key_exists('key', $args) ? $args['key'] : false; // key is in the format of comment count, datetime, id
     $page_key_decoded = $page_key ? urldecode($page_key) : 'none';
@@ -50,9 +71,9 @@ final class Posts_fetch_list_discussed_before_action {
           GROUP BY pixelpost_comments.parent_id
           ORDER BY comment_count {$sql_order}, pixelpost_pixelpost.datetime {$sql_order}, pixelpost_pixelpost.id {$sql_order}
         ) AS page_discussed
-        WHERE comment_count <= :page_comments
-          AND ( comment_count < :page_comments OR ( datetime <= :page_datetime
-            AND ( datetime < :page_datetime OR id < :page_id )
+        WHERE comment_count {$sql_inequality_or_equal} :page_comments
+          AND ( comment_count {$sql_inequality} :page_comments OR ( datetime {$sql_inequality_or_equal} :page_datetime
+            AND ( datetime {$sql_inequality} :page_datetime OR id {$sql_inequality} :page_id )
           )
         ) LIMIT :limit";
 
@@ -136,8 +157,6 @@ final class Posts_fetch_list_discussed_before_action {
       'id' => $next_id,
     ] = $latest_post;
 
-    $sql_order_reverse = $sql_order === 'ASC' ? 'DESC' : 'ASC';
-
     $sql_next =
       "SELECT * FROM (
         SELECT pixelpost_pixelpost.id, pixelpost_pixelpost.datetime, headline, slug, body, image, alt_headline, alt_body, comments, exif_info, 
@@ -147,9 +166,9 @@ final class Posts_fetch_list_discussed_before_action {
         GROUP BY pixelpost_comments.parent_id
         ORDER BY comment_count {$sql_order_reverse}, pixelpost_pixelpost.datetime {$sql_order_reverse}, pixelpost_pixelpost.id {$sql_order_reverse}
       ) AS next_discussed
-      WHERE comment_count >= :next_comment_count
-        AND ( comment_count > :next_comment_count OR ( datetime >= :next_datetime
-          AND ( datetime > :next_datetime OR id > :next_id )
+      WHERE comment_count {$sql_inequality_or_equal_reverse} :next_comment_count
+        AND ( comment_count {$sql_inequality_reverse} :next_comment_count OR ( datetime {$sql_inequality_or_equal_reverse} :next_datetime
+          AND ( datetime {$sql_inequality_reverse} :next_datetime OR id {$sql_inequality_reverse} :next_id )
         )
       ) LIMIT 1";
     $sth_next = $this->pdo->prepare($sql_next);
@@ -159,7 +178,7 @@ final class Posts_fetch_list_discussed_before_action {
     $sth_next->bindParam(':next_id', $next_id, PDO::PARAM_INT);
     $sth_next->execute();
     $next_posts = $sth_next->fetchAll();
-  
+
     if (sizeof($next_posts) > 0) {
       $next_datetime_uri = $dtc->datetime_mysql_to_uri($next_datetime_mysql);
 
