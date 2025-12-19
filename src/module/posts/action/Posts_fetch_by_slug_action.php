@@ -14,6 +14,8 @@ final class Posts_fetch_by_slug_action {
   }
 
   public function __invoke(Request $request, Response $response, array $args): Response {
+    $api_base_url = $_ENV['API_BASE_URL'];
+
     $slug = $args['slug'];
     $slug_decoded = urldecode($slug);
 
@@ -27,6 +29,21 @@ final class Posts_fetch_by_slug_action {
 
     [$id, $datetime, $headline, $slug, $body, $image, $alt_headline, $alt_body, $comments, $exif_info] = $result;
 
+    // Get any categories associated with the post
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/categories/post/id/{$id}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response_categories = curl_exec($ch);
+    curl_close($ch);
+
+    $categories = [];
+    if($response_categories === false) {
+      // Log an error
+    } else {
+      $categories_json = json_decode($response_categories);
+      $categories = $categories_json->data;
+    }
+
     $post_processed =
     [
       'id' => $id, 
@@ -37,7 +54,8 @@ final class Posts_fetch_by_slug_action {
       'image' => $image,
       'alt_headline' => $alt_headline,
       'alt_body' => $alt_body,
-      'comments' => $comments
+      'comments' => $comments,
+      'categories' => $categories
     ];
 
     $response_array = [
