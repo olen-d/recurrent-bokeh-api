@@ -14,6 +14,8 @@ final class Posts_fetch_current_action {
   }
 
   public function __invoke(Request $request, Response $response): Response {
+    $api_base_url = $_ENV['API_BASE_URL'];
+
     $sth = $this->pdo->query(
       'SELECT id, datetime, headline, slug, body, image, alt_headline, alt_body, comments, exif_info
       FROM pixelpost_pixelpost ORDER BY datetime DESC LIMIT 1'
@@ -21,6 +23,21 @@ final class Posts_fetch_current_action {
     $result = $sth->fetch();
 
     [$id, $datetime, $headline, $slug, $body, $image, $alt_headline, $alt_body, $comments, $exif_info] = $result;
+
+    // Get any categories associated with the post
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/categories/post/id/{$id}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response_categories = curl_exec($ch);
+    curl_close($ch);
+
+    $categories = [];
+    if($response_categories === false) {
+      // Log an error
+    } else {
+      $categories_json = json_decode($response_categories);
+      $categories = $categories_json->data;
+    }
 
     $post_processed =
     [
@@ -32,7 +49,8 @@ final class Posts_fetch_current_action {
       'image' => $image,
       'alt_headline' => $alt_headline,
       'alt_body' => $alt_body,
-      'comments' => $comments
+      'comments' => $comments,
+      'categories' => $categories
     ];
     
     $response_array = [
