@@ -29,13 +29,27 @@ final class Posts_fetch_by_slug_action {
 
     [$id, $datetime, $headline, $slug, $body, $image, $alt_headline, $alt_body, $comments, $exif_info] = $result;
 
-    // Get any categories associated with the post
+    // Get any attributes associated with the post
     $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/attributes/post/id/{$id}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response_attributes = curl_exec($ch);
+    curl_reset($ch);
+
+    // Get any categories associated with the post
     curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/categories/post/id/{$id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response_categories = curl_exec($ch);
     curl_close($ch);
 
+    $attributes = [];
+    if ($response_attributes === false) {
+      // Log an error
+    } else {
+      $attributes_json = json_decode($response_attributes);
+      $attributes = $attributes_json->data;
+    }
+  
     $categories = [];
     if($response_categories === false) {
       // Log an error
@@ -55,6 +69,7 @@ final class Posts_fetch_by_slug_action {
       'alt_headline' => $alt_headline,
       'alt_body' => $alt_body,
       'comments' => $comments,
+      'attributes' => $attributes,
       'categories' => $categories
     ];
 
