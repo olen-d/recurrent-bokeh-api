@@ -15,6 +15,8 @@ return function (App $app) {
     $group->get('/post', \App\module\posts\action\Posts_fetch_current_action::class);
     // Stud for getting an arbitrary post by id
     // $group->get('/post/{id:[0-9]+}', \App\module\posts\action\Posts_fetch_by_id_action::class);
+    $group->get('/attributes/values', \App\module\attributes\action\Attributes_fetch_values_list_action::class);
+    $group->get('/attributes/post/id/{id}', \App\module\attributes\action\Attributes_fetch_list_by_post_action::class);
     $group->get('/categories', \App\module\categories\action\Categories_fetch_list_action::class);
     $group->get('/categories/post/id/{id}', \App\module\categories\action\Categories_fetch_list_by_post_action::class);
     $group->get('/post/{slug}', \App\module\posts\action\Posts_fetch_by_slug_action::class);
@@ -23,6 +25,8 @@ return function (App $app) {
     $group->get('/posts/before/{datetime}', \App\module\posts\action\Posts_fetch_list_before_action::class);
     $group->get('/posts/previous/{datetime}', \App\module\posts\action\Posts_fetch_previous_action::class);
     $group->get('/posts/next/{datetime}', \App\module\posts\action\Posts_fetch_next_action::class);
+    $group->get('/posts/attribute/{slug}/after/{datetime}', \App\module\posts\action\Posts_fetch_list_by_attribute_after_action::class);
+    $group->get('/posts/attribute/{slug}/before/{datetime}', \App\module\posts\action\Posts_fetch_list_by_attribute_before_action::class);
     $group->get('/posts/category/{slug}', \App\module\posts\action\Posts_fetch_list_by_category_action::class);
     $group->get('/posts/category/{slug}/after/{datetime}', \App\module\posts\action\Posts_fetch_list_by_category_after_action::class);
     $group->get('/posts/category/{slug}/before/{datetime}', \App\module\posts\action\Posts_fetch_list_by_category_before_action::class);
