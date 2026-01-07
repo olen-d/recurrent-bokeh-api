@@ -32,6 +32,9 @@ return function (App $app) {
     $group->get('/posts/category/{slug}/before/{datetime}', \App\module\posts\action\Posts_fetch_list_by_category_before_action::class);
     $group->get('/posts/discussed/after[/{key}]', \App\module\posts\action\Posts_fetch_list_discussed_after_action::class);
     $group->get('/posts/discussed/before[/{key}]', \App\module\posts\action\Posts_fetch_list_discussed_before_action::class);
+    $group->get('/posts/tag/{slug}/after/{datetime}', \App\module\posts\action\Posts_fetch_list_by_tag_after_action::class);
+    $group->get('/posts/tag/{slug}/before/{datetime}',\App\module\posts\action\Posts_fetch_list_by_tag_before_action::class);
+    $group->get('/tags', \App\module\tags\action\Tags_fetch_values_list_action::class);
     $group->get('/pixel', \App\resources\migrations\convert\Pixelpost_create_slugs::class);
     $group->get('/pixelcat', \App\resources\migrations\Pixelpost_create_category_slugs::class);
     $group->get('/doritos', App\application\middlware\Cors_middleware::class);
