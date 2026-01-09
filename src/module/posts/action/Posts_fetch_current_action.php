@@ -35,6 +35,13 @@ final class Posts_fetch_current_action {
     curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/categories/post/id/{$id}");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     $response_categories = curl_exec($ch);
+    curl_reset($ch);
+
+    // Get any tags associated with the post
+    curl_setopt($ch, CURLOPT_URL, "{$api_base_url}/tags/post/id/{$id}");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response_tags = curl_exec($ch);
+
     curl_close($ch);
 
     $attributes = [];
@@ -53,6 +60,14 @@ final class Posts_fetch_current_action {
       $categories = $categories_json->data;
     }
 
+    $tags = [];
+    if($response_tags === false) {
+      // Log an error
+    } else {
+      $tags_json = json_decode($response_tags);
+      $tags = $tags_json->data;
+    }
+
     $post_processed =
     [
       'id' => $id, 
@@ -65,7 +80,8 @@ final class Posts_fetch_current_action {
       'alt_body' => $alt_body,
       'comments' => $comments,
       'attributes' => $attributes,
-      'categories' => $categories
+      'categories' => $categories,
+      'tags' => $tags
     ];
     
     $response_array = [
