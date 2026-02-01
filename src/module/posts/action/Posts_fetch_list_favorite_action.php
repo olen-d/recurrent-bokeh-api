@@ -35,12 +35,12 @@ final class Posts_fetch_list_favorite_action {
         [
           'id' => $id, 
           'datetime' => $datetime,
-          'headline' => $headline,
+          'headline' => stripSlashes($headline),
           'slug' => $slug,
-          'body' => $body,
+          'body' => stripSlashes($body),
           'image' => $image,
-          'alt_headline' => $alt_headline,
-          'alt_body' => $alt_body,
+          'alt_headline' => stripSlashes($alt_headline),
+          'alt_body' => stripSlashes($alt_body),
           'comments' => $comments
         ]
         );
