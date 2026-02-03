@@ -111,11 +111,31 @@ final class Posts_fetch_list_by_category_after_action {
       $links['previous'] = "/posts/before/{$prev_datetime_uri}?limit=$page_size";
     } 
 
+    $sql_cat_meta = 
+      'SELECT id, name, slug, alt_name
+      FROM pixelpost_categories
+      WHERE pixelpost_categories.slug = :slug LIMIT 1';
+
+    $sth_cat_meta = $this->pdo->prepare($sql_cat_meta);
+    $sth_cat_meta->bindParam(':slug', $slug_decoded, PDO::PARAM_STR);
+    $sth_cat_meta->execute();
+    $cat_meta = $sth_cat_meta->fetch();
+
+    [$cat_id, $cat_name, $cat_slug, $cat_alt_name] = $cat_meta;
+
+    $meta = [
+      'cat_id' => $cat_id,
+      'cat_name' => $cat_name,
+      'cat_slug' => $cat_slug,
+      'cat_alt_name' => $cat_alt_name
+    ];
+
     $response_array = [
       'status' => 'success',
       'data' => $posts_processed,
       'pagination' => $pagination,
-      'links' => $links
+      'links' => $links,
+      'meta' => $meta
     ];
 
     $output_json = json_encode($response_array);
