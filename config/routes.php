@@ -19,6 +19,7 @@ return function (App $app) {
     $group->get('/attributes/post/id/{id}', \App\module\attributes\action\Attributes_fetch_list_by_post_action::class);
     $group->get('/categories', \App\module\categories\action\Categories_fetch_list_action::class);
     $group->get('/categories/post/id/{id}', \App\module\categories\action\Categories_fetch_list_by_post_action::class);
+    $group->get('/categories/posts', \App\module\categories\action\Categories_fetch_list_and_posts_action::class);
     $group->get('/post/{slug}', \App\module\posts\action\Posts_fetch_by_slug_action::class);
     $group->get('/posts', \App\module\posts\action\Posts_fetch_list_action::class);
     $group->get('/posts/after/{datetime}', \App\module\posts\action\Posts_fetch_list_after_action::class);
